@@ -41,15 +41,16 @@ install:
   - mkdir -p build
   - cd build
   - cmake -DCMAKE_INSTALL_PREFIX=$ODIN_DATA_ROOT -DHDF5_ROOT=$HDF5_ROOT -DBLOSC_ROOT_DIR=$BLOSC_ROOT -DKAFKA_ROOT_DIR=$KAFKA_ROOT ..
-  - make -j 8 VERBOSE=1
+  - make -j8 VERBOSE=1
   - make install
   - cd ../../excalibur-detector
   - mkdir -p build
   - mkdir -p prefix
   - cd build
   - cmake -DCMAKE_INSTALL_PREFIX=$EXCALIBUR_ROOT -DODINDATA_ROOT_DIR=$ODIN_DATA_ROOT ../data
-  - make -j 8 VERBOSE=1
+  - make -j8 VERBOSE=1
+  - make install
   - cd ../../
 
 script:
-  - odin-data/prefix/bin/frameSimulator Excalibur --lib-path=$EXCALIBUR_ROOT/lib --help
+  - $ODIN_DATA_ROOT/bin/frameSimulator Excalibur --lib-path=$EXCALIBUR_ROOT/lib --help
