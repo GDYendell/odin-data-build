@@ -1,0 +1,55 @@
+language: cpp
+sudo: false
+
+git:
+   submodules: false
+
+os: linux
+compiler: gcc
+addons:
+  apt:
+    packages:
+    - liblog4cxx10-dev
+    - libboost-program-options-dev
+    - libboost-filesystem-dev
+    - libboost-date-time-dev
+    - libboost-system-dev
+    - libboost-test-dev
+    - libboost-thread-dev
+    - libzmq3-dev
+    - libpcap-dev
+
+env: HDF5_ROOT=$HOME/hdf5-1.10.1 BLOSC_ROOT=$HOME/c-blosc-1.14.2 KAFKA_ROOT=$HOME/librdkafka-1.0.0
+         ODIN_DATA_ROOT=$HOME/odin-data/prefix EXCALIBUR_ROOT=$HOME/excalibur-detector/prefix
+
+cache:
+  directories:
+    - "$HOME/hdf5-1.10.1"
+    - "$HOME/c-blosc-1.14.2"
+    - "$HOME/librdkafka-1.0.0"
+    - "$HOME/.cache/pip"
+    - "$HOME/.local/lib"
+
+before_install:
+  - git submodule update --init --remote
+  - bash odin-data/.travis-install-hdf5.sh
+  - bash odin-data/.travis-install-blosc.sh
+  - bash odin-data/.travis-install-librdkafka.sh
+
+install:
+  - cd odin-data
+  - mkdir -p build
+  - cd build
+  - cmake -DCMAKE_INSTALL_PREFIX=$ODIN_DATA_ROOT -DHDF5_ROOT=$HDF5_ROOT -DBLOSC_ROOT_DIR=$BLOSC_ROOT -DKAFKA_ROOT_DIR=$KAFKA_ROOT ..
+  - make -j 8 VERBOSE=1
+  - make install
+  - cd ../../excalibur-detector
+  - mkdir -p build
+  - mkdir -p prefix
+  - cd build
+  - cmake -DCMAKE_INSTALL_PREFIX=$EXCALIBUR_ROOT -DODINDATA_ROOT_DIR=$ODIN_DATA_ROOT ../data
+  - make -j 8 VERBOSE=1
+  - cd ../../
+
+script:
+  - odin-data/prefix/bin/frameSimulator Excalibur --lib-path=$EXCALIBUR_ROOT/lib --help
