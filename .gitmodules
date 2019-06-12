@@ -1,6 +1,6 @@
 [submodule "odin-data"]
 	path = odin-data
-	url = https://github.com/odin-detector/odin-data.git
+	url = https://github.com/dls-controls/odin-data.git
 	branch = systemtest
 [submodule "excalibur-detector"]
 	path = excalibur-detector
